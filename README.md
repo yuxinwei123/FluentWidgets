@@ -16,7 +16,7 @@ CustomWindowComponents/
 ├── README.md                       # 本文件
 │
 ├── src/                            # ★ 组件库源码
-│   ├── CMakeLists.txt              # 组件库构建配置 (静态库 FluentWidgets)
+│   ├── CMakeLists.txt              # 组件库构建配置 (动态库 FluentWidgets)
 │   ├── FluentWidgets.h             # 统一头文件，引入即可使用全部 API
 │   │
 │   ├── Core/                       # 核心基础设施层
@@ -37,8 +37,41 @@ CustomWindowComponents/
 │       │   └── FluentWidget.h/cpp  # 组件公共基类
 │       ├── Buttons/
 │       │   └── FluentButton.h/cpp  # 标准按钮 (8 种变体)
+│       ├── Dialog/
+│       │   ├── FluentContentDialog.h/cpp  # 内容对话框 (Info/Warning/Error/Success)
+│       │   ├── FluentPopover.h/cpp        # 悬浮气泡 (锚定/箭头/自动关闭)
+│       │   └── FluentDrawer.h/cpp         # 抽屉 (左/右/上/下滑入 + 遮罩)
+│       ├── Display/
+│       │   ├── FluentInfoBar.h/cpp        # 气泡消息条 (顶部/底部弹出)
+│       │   ├── FluentCarousel.h/cpp       # 轮播图 (自动播放/指示器/箭头)
+│       │   ├── FluentProgressBar.h/cpp    # 进度条 (线形/环形/条纹/不确定)
+│       │   ├── FluentProgressRing.h/cpp   # 进度环 (旋转动画/渐变色)
+│       │   └── FluentCard.h/cpp           # 卡片容器 (标题/封面/悬停提升)
+│       ├── Input/
+│       │   ├── FluentLineEdit.h/cpp       # 单行输入框
+│       │   ├── FluentCheckBox.h/cpp       # 复选框
+│       │   ├── FluentToggleSwitch.h/cpp   # 开关
+│       │   ├── FluentSpinBox.h/cpp        # 数值微调框
+│       │   ├── FluentComboBox.h/cpp       # 下拉选择框
+│       │   ├── FluentSlider.h/cpp         # 滑块
+│       │   ├── FluentDatePicker.h/cpp     # 日期选择器 (弹出日历)
+│       │   ├── FluentTimePicker.h/cpp     # 时间选择器 (滚轮/12-24小时制)
+│       │   └── FluentColorPicker.h/cpp    # 颜色选择器 (色板/透明度/HEX)
+│       ├── Data/
+│       │   ├── FluentTable.h/cpp          # 数据表格
+│       │   ├── FluentTree.h/cpp           # 树形控件
+│       │   ├── FluentGraph.h/cpp          # 节点图
+│       │   ├── FluentCalendar.h/cpp       # 日历
+│       │   ├── FluentLineChart.h/cpp      # 折线图
+│       │   ├── FluentBarChart.h/cpp       # 柱状图
+│       │   ├── FluentTimeline.h/cpp       # 历程图
+│       │   └── FluentPieChart.h/cpp       # 饼图
+│       ├── Navigation/
+│       │   ├── FluentNavigationItem.h/cpp # 导航项
+│       │   ├── FluentNavigationView.h/cpp # 导航视图 (侧边栏)
+│       │   └── FluentNavBar.h/cpp         # 导航栏
 │       └── Window/
-│           ├── FluentWindow.h/cpp  # 无边框窗口
+│           ├── FluentWindow.h/cpp  # 无边框窗口 (Mica/Acrylic)
 │           └── FluentTitleBar.h/cpp# 自定义标题栏
 │
 └── demo/                           # 组件展示应用
@@ -60,6 +93,9 @@ CustomWindowComponents/
 │         Widgets (组件层)                   │  ← 对外 API
 │   FluentWidget → FluentButton            │
 │   FluentWindow / FluentTitleBar          │
+│   FluentLineEdit / FluentCheckBox / ...  │
+│   FluentTable / FluentTree / ...         │
+│   FluentCard / FluentDrawer / ...        │
 ├───────────────────────────────────────────┤
 │      Effects (效果层)                      │  ← 可组合的视觉效果
 │   Acrylic / Reveal / Shadow / Ripple     │
@@ -595,21 +631,34 @@ FluentTitleBar : QWidget
 
 **文件**：`demo/main.cpp` / `demo/MainWindow.h` / `demo/MainWindow.cpp`
 
-展示组件库用法的小应用。继承 `FluentWindow`，在中央区域放置各种 `FluentButton` 变体，点击按钮更新状态标签。
+展示组件库全部组件的交互式 Demo 应用。继承 `FluentWindow`，使用 `FluentNavigationView` 实现侧边栏导航，每个组件对应一个独立展示页面。
 
-**关键代码**：
-```cpp
-// 创建各种变体按钮
-auto* primaryBtn = new FluentButton(u8"Primary", FluentButtonVariant::Primary, page);
-auto* secondaryBtn = new FluentButton(u8"Secondary", FluentButtonVariant::Secondary, page);
-auto* subtleBtn = new FluentButton(u8"Subtle", FluentButtonVariant::Subtle, page);
-auto* dangerBtn = new FluentButton(u8"Danger", FluentButtonVariant::Danger, page);
+### Demo 页面一览
 
-// 连接信号
-connect(primaryBtn, &FluentButton::clicked, this, [statusLabel]() {
-    statusLabel->setText(u8"Primary 按钮被点击");
-});
-```
+| 页面 | 展示组件 | 关键功能 |
+|------|---------|---------|
+| 首页 | FluentCard | 组件卡片导航，点击跳转 |
+| 按钮 & 开关 | FluentButton, FluentCheckBox, FluentToggleSwitch | 8 种按钮变体、复选框、开关 |
+| 输入框 | FluentLineEdit, FluentSpinBox, FluentComboBox | 文本输入、数值微调、下拉选择 |
+| 对话框 | FluentContentDialog, FluentPopover | 4 种对话框类型、气泡弹出 |
+| 抽屉 | FluentDrawer | 左/右/上/下滑入、遮罩控制、丰富内容 |
+| 表格 | FluentTable | 数据表格 |
+| 树 | FluentTree | 树形控件 |
+| 节点图 | FluentGraph | 可拖拽节点图 |
+| 导航栏 | FluentNavBar | 导航栏组件 |
+| 日历 | FluentCalendar | 月份切换、日期选择 |
+| 轮播图 | FluentCarousel | 自动播放、指示器、箭头 |
+| 卡片 | FluentCard | 标题/封面/悬停提升/可点击 |
+| 进度条 | FluentProgressBar | 线形/环形/条纹/不确定模式 |
+| 进度环 | FluentProgressRing | 确定/旋转/渐变色/不同线宽 |
+| 线图 | FluentLineChart | 折线图 |
+| 柱状图 | FluentBarChart | 柱状图 |
+| 历程图 | FluentTimeline | 时间线 |
+| 饼图 | FluentPieChart | 饼图 |
+| 滑块 | FluentSlider | 单值/范围/刻度 |
+| 日期选择 | FluentDatePicker | 弹出日历、格式化、范围限制 |
+| 时间选择 | FluentTimePicker | 滚轮、12/24小时制 |
+| 颜色选择 | FluentColorPicker | 预设色板、透明度、HEX 输入 |
 
 **Qt 知识点**：
 - `FluentThemeManager::instance().currentTheme()`：在非 FluentWidget 中获取主题
@@ -642,8 +691,78 @@ cmake --build build --config Release
 
 | 目标 | 类型 | 说明 |
 |------|------|------|
-| `FluentWidgets` | 静态库 | 组件库，链接到 `Qt5::Core Qt5::Gui Qt5::Widgets` + `dwmapi user32`(Win) |
+| `FluentWidgets` | 动态库 | 组件库，链接到 `Qt5::Core Qt5::Gui Qt5::Widgets` + `dwmapi user32`(Win) |
 | `FluentWidgetsDemo` | 可执行文件 | Demo 应用，链接到 `FluentWidgets` |
+
+---
+
+## 组件一览
+
+### 按钮 (Buttons)
+
+| 组件 | 文件 | 说明 |
+|------|------|------|
+| FluentButton | `Widgets/Buttons/FluentButton.h` | 8 种变体按钮 (Primary/Secondary/Subtle/Accent/Transparent/Danger/Toggle/Split) |
+
+### 输入 (Input)
+
+| 组件 | 文件 | 说明 |
+|------|------|------|
+| FluentLineEdit | `Widgets/Input/FluentLineEdit.h` | 单行输入框，支持密码模式/错误状态/清除按钮 |
+| FluentCheckBox | `Widgets/Input/FluentCheckBox.h` | 复选框 |
+| FluentToggleSwitch | `Widgets/Input/FluentToggleSwitch.h` | 开关切换 |
+| FluentSpinBox | `Widgets/Input/FluentSpinBox.h` | 数值微调框 |
+| FluentComboBox | `Widgets/Input/FluentComboBox.h` | 下拉选择框 |
+| FluentSlider | `Widgets/Input/FluentSlider.h` | 滑块，单值/范围/刻度 |
+| FluentDatePicker | `Widgets/Input/FluentDatePicker.h` | 日期选择器，弹出日历面板 |
+| FluentTimePicker | `Widgets/Input/FluentTimePicker.h` | 时间选择器，滚轮/12-24小时制 |
+| FluentColorPicker | `Widgets/Input/FluentColorPicker.h` | 颜色选择器，预设色板/透明度/HEX |
+
+### 展示 (Display)
+
+| 组件 | 文件 | 说明 |
+|------|------|------|
+| FluentInfoBar | `Widgets/Display/FluentInfoBar.h` | 气泡消息条，顶部/底部弹出，4 种类型 |
+| FluentCarousel | `Widgets/Display/FluentCarousel.h` | 轮播图，自动播放/指示器/箭头 |
+| FluentProgressBar | `Widgets/Display/FluentProgressBar.h` | 进度条，线形/环形/条纹/不确定模式 |
+| FluentProgressRing | `Widgets/Display/FluentProgressRing.h` | 环形进度，旋转动画/渐变色/可调线宽 |
+| FluentCard | `Widgets/Display/FluentCard.h` | 卡片容器，标题/封面/悬停提升/可点击 |
+
+### 对话框 (Dialog)
+
+| 组件 | 文件 | 说明 |
+|------|------|------|
+| FluentContentDialog | `Widgets/Dialog/FluentContentDialog.h` | 内容对话框，Info/Warning/Error/Success + 遮罩动画 |
+| FluentPopover | `Widgets/Dialog/FluentPopover.h` | 悬浮气泡，锚定/箭头/自动关闭 |
+| FluentDrawer | `Widgets/Dialog/FluentDrawer.h` | 抽屉，左/右/上/下滑入 + 遮罩 + 滑动动画 |
+
+### 数据 (Data)
+
+| 组件 | 文件 | 说明 |
+|------|------|------|
+| FluentTable | `Widgets/Data/FluentTable.h` | 数据表格 |
+| FluentTree | `Widgets/Data/FluentTree.h` | 树形控件 |
+| FluentGraph | `Widgets/Data/FluentGraph.h` | 可拖拽节点图 |
+| FluentCalendar | `Widgets/Data/FluentCalendar.h` | 日历控件 |
+| FluentLineChart | `Widgets/Data/FluentLineChart.h` | 折线图 |
+| FluentBarChart | `Widgets/Data/FluentBarChart.h` | 柱状图 |
+| FluentTimeline | `Widgets/Data/FluentTimeline.h` | 历程图/时间线 |
+| FluentPieChart | `Widgets/Data/FluentPieChart.h` | 饼图 |
+
+### 导航 (Navigation)
+
+| 组件 | 文件 | 说明 |
+|------|------|------|
+| FluentNavigationItem | `Widgets/Navigation/FluentNavigationItem.h` | 导航项 |
+| FluentNavigationView | `Widgets/Navigation/FluentNavigationView.h` | 侧边栏导航视图 |
+| FluentNavBar | `Widgets/Navigation/FluentNavBar.h` | 顶部导航栏 |
+
+### 窗口 (Window)
+
+| 组件 | 文件 | 说明 |
+|------|------|------|
+| FluentWindow | `Widgets/Window/FluentWindow.h` | 无边框窗口，Mica/Acrylic 效果 |
+| FluentTitleBar | `Widgets/Window/FluentTitleBar.h` | 自定义标题栏 |
 
 ---
 
@@ -653,21 +772,26 @@ cmake --build build --config Release
 |--------|---------|------|
 | `Q_OBJECT` 宏 | 所有 QObject 子类 | 启用信号槽、Q_PROPERTY、`qobject_cast` |
 | `Q_PROPERTY` | FluentTheme(21), FluentWidget(1), FluentButton(4), ... | 属性系统，支持信号通知、QSS 绑定 |
-| `QPainter` 自绘 | FluentWidget, FluentButton, FluentTitleBar | 完全自绘组件的核心 |
-| `QPainterPath::addRoundedRect()` | FluentButton | 绘制圆角矩形 |
-| `QRadialGradient` | FluentRevealEffect | 径向渐变，Reveal 高光 |
-| `QPropertyAnimation` | FluentAnimation, FluentButton | 属性动画，驱动 Q_PROPERTY 插值 |
-| `QEasingCurve` | FluentAnimation | 缓动曲线，`BezierSpline` 自定义贝塞尔 |
+| `QPainter` 自绘 | 所有 FluentWidget 子类 | 完全自绘组件的核心 |
+| `QPainterPath::addRoundedRect()` | FluentButton, FluentCard | 绘制圆角矩形 |
+| `QRadialGradient` | FluentRevealEffect, FluentColorPicker | 径向渐变，Reveal 高光 / 透明度滑块 |
+| `QConicalGradient` | FluentProgressBar(RingBar), FluentProgressRing | 锥形渐变，环形进度弧 |
+| `QLinearGradient` | FluentProgressBar, FluentColorPicker | 线性渐变，进度条/Alpha 滑块 |
+| `QPropertyAnimation` | FluentAnimation, FluentDrawer, FluentContentDialog | 属性动画，驱动 Q_PROPERTY 插值 |
+| `QEasingCurve` | FluentAnimation, FluentDrawer | 缓动曲线，OutCubic/InCubic/自定义贝塞尔 |
 | `QWidget::grab()` | FluentAcrylicEffect | 捕获 Widget 画面为 QPixmap |
 | `nativeEvent()` | FluentWindow | 拦截 Windows 原生消息，Qt5 签名 `long*` |
-| `Qt::FramelessWindowHint` | FluentWindow | 无边框窗口 |
-| `Qt::WA_TranslucentBackground` | FluentWindow | 窗口透明背景 |
-| `setMouseTracking(true)` | FluentWidget, FluentRevealEffect | 无需按下即可追踪鼠标 |
+| `Qt::FramelessWindowHint` | FluentWindow, FluentDrawer | 无边框窗口 |
+| `Qt::WA_TranslucentBackground` | FluentWindow, FluentDrawer, FluentContentDialog | 窗口/对话框透明背景 |
+| `Qt::Popup` | FluentDatePicker, FluentTimePicker, FluentColorPicker, FluentComboBox | 弹出面板窗口标志 |
+| `setMouseTracking(true)` | FluentWidget, FluentRevealEffect, ColorGrid | 无需按下即可追踪鼠标 |
 | `enterEvent(QEvent*)` / `leaveEvent()` | FluentWidget | Qt5 签名（Qt6 为 QEnterEvent*） |
 | `QWidget::update()` | 多处 | 请求异步重绘 |
 | `QApplication::allWidgets()` | FluentThemeManager | 遍历所有 Widget 进行主题刷新 |
+| `QTimer::singleShot()` | FluentDatePicker, FluentTimePicker, FluentColorPicker | 延迟焦点检查，避免弹出面板误关 |
 | `DwmSetWindowAttribute()` | FluentWindow | Windows 11 Mica/Acrylic 效果 API |
-| `FLUENT_EXPORT` 宏 | 所有公开类 | 静态库为空；动态库时 `Q_DECL_EXPORT/IMPORT` |
+| `FLUENT_EXPORT` 宏 | 所有公开类 | 动态库 `Q_DECL_EXPORT/IMPORT` |
 | 单例模式 | FluentConfig, FluentThemeManager | `static T& instance()` 利用静态局部变量 |
 | 模板方法模式 | FluentWidget | `paintEvent()` 调用纯虚 `paintFluent()` |
 | 观察者模式 | 主题系统 | `FluentTheme::themeChanged` → 各组件 `update()` |
+| 事件过滤器 | FluentColorPicker, FluentCard | `eventFilter()` 处理弹出面板外部点击 / 封面自绘 |
