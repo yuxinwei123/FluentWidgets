@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>fluent.svg</file>
+        <file>fluent_dark.svg</file>
+    </qresource>
+</RCC>
